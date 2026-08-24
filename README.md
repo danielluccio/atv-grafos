@@ -5,7 +5,7 @@ As restrições de recursos são definidas na questão por até 1 segundo de tem
 - Entradas\
 As entradas são duas variáveis chamadas n(quantidade de linhas) e m(quantidade de colunas), que deve formar um labirinto retangular que pode ser representado por meio de uma matriz. n e m <= 1000, ou seja podemos ter até 1000000 de células.
 - Elementos\
-Os elementos possíveis são A(Ponto Inicial), B(Ponto final), #(Parede), .(Espaço por onde é possivel caminhar).
+Os elementos possíveis são A(Ponto Inicial), B(Ponto final), #(Parede), .(Esparso por onde é possivel caminhar).
 
 - Saída\
 Existe um caminho válido para sair do ponto A até o B ?\
