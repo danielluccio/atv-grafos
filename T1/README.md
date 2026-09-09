@@ -9,8 +9,8 @@ Trabalho desenvolvido para a disciplina de **Resolução de Problemas com Grafos
 | Integrante | Matrícula |
 |---|---|
 | DANIEL LUCIO DE CASTRO | `2310285` |
-| JUAN DOTH CAMERINO COSTA COELHO | `MATRÍCULA` |
-| GGUILHERME MACHADO FARIA | `21161881` |
+| JUAN DOTH CAMERINO COSTA COELHO | `2417203` |
+| GUILHERME MACHADO FARIA | `21161881` |
 
 ---
 
