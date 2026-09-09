@@ -1,52 +1,44 @@
 import sys
-from collections import deque
+
+from labyrinth_graph import LabyrinthGraph
+from labyrinth_bfs import LabyrinthBFS
+from path_converter import vertices_to_moves
+
 
 def main():
-    data = sys.stdin.read().split('\n')
-    n, m = map(int, data[0].split())
-    grade = data[1:1+n]
+    input_stream = sys.stdin
 
-    for i in range(n):
-        for j in range(m):
-            if grade[i][j] == 'A':
-                inicio = (i, j)
-            elif grade[i][j] == 'B':
-                fim = (i, j)
+    n, m = map(int, input_stream.readline().split())
 
-    DIRECOES = [('U', -1, 0), ('D', 1, 0), ('L', 0, -1), ('R', 0, 1)]
+    grid = [
+        input_stream.readline().strip()
+        for _ in range(n)
+    ]
 
-    visitado = [[False] * m for _ in range(n)]
-    veio_de  = [[None] * m for _ in range(n)]
+    labyrinth = LabyrinthGraph(grid)
 
-    si, sj = inicio
-    visitado[si][sj] = True
-    fila = deque([inicio])
+    bfs = LabyrinthBFS(
+        labyrinth.graph,
+        labyrinth.start_vertex,
+    )
 
-    while fila:
-        ci, cj = fila.popleft()
-        if (ci, cj) == fim:
-            break
-        for letra, di, dj in DIRECOES:
-            ni, nj = ci + di, cj + dj
-            if 0 <= ni < n and 0 <= nj < m and not visitado[ni][nj] and grade[ni][nj] != '#':
-                visitado[ni][nj] = True
-                veio_de[ni][nj] = (ci, cj, letra)
-                fila.append((ni, nj))
+    target = labyrinth.target_vertex
 
-    if not visitado[fim[0]][fim[1]]:
+    if not bfs.has_path_to(target):
         print("NO")
         return
 
-    caminho = []
-    atual = fim
-    while atual != inicio:
-        pi, pj, letra = veio_de[atual[0]][atual[1]]
-        caminho.append(letra)
-        atual = (pi, pj)
-    caminho.reverse()
+    vertex_path = bfs.path_to(target)
+
+    moves = vertices_to_moves(
+        vertex_path,
+        labyrinth.vertex_to_position,
+    )
 
     print("YES")
-    print(len(caminho))
-    print(''.join(caminho))
+    print(bfs.distance_to(target))
+    print(moves)
 
-main()
+
+if __name__ == "__main__":
+    main()

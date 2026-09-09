@@ -1,87 +1,34 @@
-# Marco 1 — Modelagem
+# Marco 1 — Modelagem do problema
 
-**Problema:** B — CSES 1193, *Labyrinth*
-**Link oficial:** https://cses.fi/problemset/task/1193
-**Categoria no CSES:** Graph Algorithms
+## Objetivo do marco
 
-## 1. Enunciado (resumo próprio)
+Neste primeiro acompanhamento, a equipe apresentou a interpretação inicial do problema **Labyrinth (CSES 1193)** e realizou sua modelagem utilizando conceitos de grafos.
 
-Dada uma grade de `n` linhas por `m` colunas representando um labirinto, determinar se existe um
-caminho entre uma posição de início `A` e uma posição de destino `B`, andando apenas nas quatro
-direções cardeais (cima, baixo, esquerda, direita) e sem atravessar paredes. Se existir caminho, é
-preciso reportar o comprimento do caminho **mais curto** e a própria rota, como sequência de
-movimentos.
+O objetivo principal foi deixar de enxergar o problema apenas como uma matriz e identificar formalmente quais elementos do labirinto poderiam ser representados como **vértices** e **arestas**.
 
-Não é permitido andar na diagonal, nem sair dos limites da grade, nem passar por cima de uma parede.
+---
 
-## 2. Entrada
+## Problema analisado
 
-```
-n m
-<n linhas, cada uma com m caracteres>
-```
+O problema recebe uma matriz de `n` linhas e `m` colunas contendo:
 
-- `1 ≤ n, m ≤ 1000`
-- Cada célula é um dos quatro caracteres:
-  - `.` — chão (livre)
-  - `#` — parede (bloqueada)
-  - `A` — posição inicial (ocorre **exatamente uma vez** na entrada)
-  - `B` — posição de destino (ocorre **exatamente uma vez** na entrada)
+- `.` — célula livre;
+- `#` — parede;
+- `A` — posição inicial;
+- `B` — posição de destino.
 
-## 3. Saída
+A movimentação é permitida apenas em quatro direções:
 
-- `NO`, se não existir caminho de `A` até `B`; ou
-- três linhas:
-  1. `YES`
-  2. o comprimento do caminho mais curto (número de movimentos)
-  3. a rota, como uma string de caracteres `L`, `R`, `U`, `D` (esquerda, direita, cima, baixo)
+- esquerda (`L`);
+- direita (`R`);
+- cima (`U`);
+- baixo (`D`).
 
-## 4. Restrições
+O objetivo é determinar se existe um caminho entre `A` e `B` e, caso exista, encontrar um caminho de menor comprimento.
 
-| Restrição            | Valor                                   |
-|-----------------------|------------------------------------------|
-| Dimensões da grade    | `1 ≤ n, m ≤ 1000` (até 10⁶ células)      |
-| Limite de tempo       | 1 segundo                                |
-| Limite de memória     | 512 MB                                   |
-| Ocorrências de `A`/`B`| exatamente uma de cada, garantido pelo enunciado |
+Exemplo utilizado durante os acompanhamentos:
 
-A restrição de tempo é o motivo pelo qual a solução precisa ser **linear no número de células**
-(ver justificativa completa no Marco 4, seção de complexidade).
-
-## 5. Modelagem como grafo
-
-O labirinto não vem pronto como grafo — ele precisa ser **enxergado** como um. A regra de
-modelagem escolhida é a padrão para problemas de grade:
-
-- **Vértices `V`:** toda célula que não é parede vira um nó.
-
-  `V = { (i, j) : grade[i][j] ≠ '#' , 0 ≤ i < n, 0 ≤ j < m }`
-
-- **Arestas `E`:** duas células viram uma aresta quando são vizinhas ortogonais (distância de
-  Manhattan igual a 1) e nenhuma das duas é parede.
-
-  `E = { {(i,j), (i',j')} ∈ V×V : |i−i'| + |j−j'| = 1 }`
-
-- **Tipo do grafo:**
-  - **implícito** — nunca é montada uma lista de adjacência explícita "de uma vez"; os vizinhos de
-    cada célula são calculados sob demanda (as até 4 direções), durante a própria busca;
-  - **não-direcionado** — se `(i,j)` alcança `(i',j')`, o inverso também vale (andar para a direita
-    e depois voltar para a esquerda é sempre possível);
-  - **não-ponderado** — toda aresta representa um único passo, sem custo diferenciado;
-  - **simples** — sem laços (uma célula não é vizinha dela mesma) e sem arestas paralelas;
-  - grau máximo de cada vértice é 4 (cima, baixo, esquerda, direita), o que o caracteriza como um
-    **grafo de grade (grid graph)**, um caso particular de grafo planar.
-
-O problema "existe caminho de A até B, e qual o mais curto" é, portanto, exatamente o problema
-clássico de **caminho mínimo em grafo não-ponderado** entre dois vértices dados.
-
-## 6. Instância pequena
-
-Reaproveitamos a própria instância de exemplo do enunciado oficial do CSES — pequena (5×8 = 40
-células) e suficiente para fazer à mão todos os traços pedidos nos próximos marcos.
-
-```
-5 8
+```text
 ########
 #.A#...#
 #.##.#B#
@@ -89,29 +36,140 @@ células) e suficiente para fazer à mão todos os traços pedidos nos próximos
 ########
 ```
 
-- `A` está na linha 2, coluna 3 (1-indexado) — célula `(1,2)` em índices 0-based.
-- `B` está na linha 3, coluna 7 (1-indexado) — célula `(2,6)` em índices 0-based.
+---
 
-### Resultado esperado
+## Modelagem como grafo
 
+O labirinto foi modelado como um grafo:
+
+\[
+G = (V,E)
+\]
+
+onde:
+
+- `V` representa o conjunto de vértices;
+- `E` representa o conjunto de arestas.
+
+### Vértices
+
+Cada célula percorrível da matriz é representada por um vértice.
+
+Assim:
+
+- `.` corresponde a um vértice comum;
+- `A` corresponde ao vértice de origem;
+- `B` corresponde ao vértice de destino;
+- `#` não pertence ao conjunto de vértices, pois representa uma posição que não pode ser ocupada.
+
+Cada vértice pode ser identificado inicialmente por sua posição `(i,j)` na matriz.
+
+No exemplo:
+
+```text
+A = (2,3)
+B = (3,7)
 ```
-YES
-9
-LDDRRRRRU
+
+---
+
+## Arestas
+
+Existe uma aresta entre duas células quando:
+
+1. ambas são percorríveis;
+2. estão imediatamente lado a lado na horizontal ou vertical.
+
+Para um vértice localizado em `(i,j)`, as quatro posições potencialmente adjacentes são:
+
+\[
+(i-1,j),\quad(i+1,j),\quad(i,j-1),\quad(i,j+1)
+\]
+
+Não são permitidos movimentos diagonais.
+
+Duas posições `(i,j)` e `(x,y)` podem ser consideradas vizinhas quando:
+
+\[
+|i-x| + |j-y| = 1
+\]
+
+desde que nenhuma delas seja uma parede.
+
+---
+
+## Classificação do grafo
+
+Durante a análise, a equipe identificou as seguintes características.
+
+### Grafo não direcionado
+
+O movimento entre duas células livres pode ser realizado nos dois sentidos.
+
+Se podemos sair de `u` e chegar em `v`, também podemos sair de `v` e voltar para `u`.
+
+### Grafo não ponderado
+
+Todos os movimentos possuem o mesmo custo: **um movimento**.
+
+Dessa forma, todas as arestas podem ser consideradas equivalentes em custo.
+
+### Grau máximo igual a 4
+
+Cada célula pode possuir no máximo quatro vizinhos:
+
+```text
+        cima
+          |
+esquerda-v-direita
+          |
+        baixo
 ```
 
-Ou seja: existe caminho, o mais curto tem 9 passos, e a rota é
-esquerda, baixo, baixo, direita ×5, cima.
+Logo:
 
-## 7. Hipótese inicial de solução
+\[
+grau(v) \leq 4
+\]
 
-Como a grade vira um grafo não-ponderado, qualquer algoritmo de busca (DFS ou BFS) é capaz de
-responder "existe caminho?" percorrendo o grafo a partir de `A` e verificando se `B` é alcançado.
+### Grafo esparso
 
-A hipótese de trabalho, a ser testada nos Marcos 3 e 4, é que **apenas a busca em largura (BFS)
-garante o caminho *mais curto***, por explorar o grafo em camadas de distância crescente a partir da
-origem — a primeira vez que ela alcança um vértice, é necessariamente pela menor quantidade de
-arestas possível. A busca em profundidade (DFS), por explorar em um único ramo até o fim antes de
-voltar, resolve a existência de caminho, mas não garante minimalidade. Essa comparação empírica
-será feita nos Marcos 3 e 4, executando os dois algoritmos manualmente sobre a mesma instância
-pequena acima.
+Mesmo que o labirinto tenha muitos vértices, cada vértice possui no máximo quatro conexões.
+
+Portanto, o número de arestas é pequeno em relação ao número máximo de conexões possíveis de um grafo completo.
+
+### Grafo não necessariamente conexo
+
+As paredes podem separar as células livres em diferentes componentes.
+
+Assim, pode existir um labirinto em que `A` e `B` pertencem a componentes diferentes e não exista caminho entre eles.
+
+---
+
+## Reformulação do problema
+
+Depois da modelagem, o problema pôde ser descrito de forma puramente relacionada a grafos:
+
+> Dado um grafo não direcionado e não ponderado, determinar se existe um caminho entre um vértice de origem `A` e um vértice de destino `B` e, caso exista, encontrar um caminho com a menor quantidade de arestas.
+
+A correspondência adotada foi:
+
+```text
+LABIRINTO                    GRAFO
+
+célula livre      ->         vértice
+movimento válido  ->         aresta
+A                 ->         origem
+B                 ->         destino
+#                 ->         não pertence ao grafo
+```
+
+---
+
+## Conclusão do marco
+
+O principal resultado do Marco 1 foi mostrar que a matriz é apenas a forma de entrada do problema.
+
+A estrutura matemática que representa as possibilidades de movimentação é um **grafo não direcionado, não ponderado e esparso**.
+
+Essa modelagem criou a base necessária para, no marco seguinte, estudar uma forma adequada de representar computacionalmente os vértices e suas conexões.

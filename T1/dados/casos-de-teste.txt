@@ -1,6 +1,80 @@
+# Casos de teste - T1 Labyrinth (CSES 1193)
+# Disciplina: Resolução de problemas com Grafos
+#
+# Este arquivo registra casos usados para validar a implementação.
+# Para cada caso são mostrados:
+# - entrada original no formato do CSES: n m + matriz;
+# - abstração institucional: V, E, origem, destino e arestas;
+# - saída esperada.
+#
+# Observação:
+# A versão de submissão do CSES usa diretamente a matriz.
+# A representação com vértices e arestas é usada para validação e apresentação institucional.
+
 5 8
 ########
 #.A#...#
 #.##.#B#
 #......#
 ########
+
+[MAPEAMENTO DOS VÉRTICES]
+1  = (2,2)
+2  = A(2,3)
+3  = (2,5)
+4  = (2,6)
+5  = (2,7)
+6  = (3,2)
+7  = (3,5)
+8  = B(3,7)
+9  = (4,2)
+10 = (4,3)
+11 = (4,4)
+12 = (4,5)
+13 = (4,6)
+14 = (4,7)
+
+[ENTRADA GRAFO - FORMATO INSTITUCIONAL]
+# n m
+5 8
+# V E
+14 14
+# origem destino
+2 8
+# arestas u v
+1 2
+1 6
+3 4
+3 7
+4 5
+5 8
+6 9
+7 12
+8 14
+9 10
+10 11
+11 12
+12 13
+13 14
+
+[LISTA DE ADJACÊNCIA]
+1  -> [2, 6]
+2  -> [1]
+3  -> [4, 7]
+4  -> [3, 5]
+5  -> [4, 8]
+6  -> [1, 9]
+7  -> [3, 12]
+8  -> [5, 14]
+9  -> [6, 10]
+10 -> [9, 11]
+11 -> [10, 12]
+12 -> [7, 11, 13]
+13 -> [12, 14]
+14 -> [13, 8]
+
+[SAÍDA ESPERADA]
+YES
+9
+LDDRRRRRU
+
