@@ -31,10 +31,10 @@ def ler_dataset(linhas, pos):
 class Pontes(CC):
     def __init__(self, G):
      
-        self.pre = [0] * G.V    
-        self.low = [0] * G.V    
+        self.pre = [0] * G.V  
+        self.low = [0] * G.V   V    # menor 'pre' que o vértice alcança (via subárvore + atalho)
         self.pai = list(range(G.V))
-        self.cnt = 0           
+        self.cnt = 0           # contador da ordem de chegada
         self.pontes = []       
 
         super().__init__(G)    
@@ -50,11 +50,11 @@ class Pontes(CC):
             if not self.marked[w]:
                 self.pai[w] = v
                 self.dfs(G, w)
-                self.low[v] = min(self.low[v], self.low[w])
-                if self.low[w] > self.pre[v]:
+                self.low[v] = min(self.low[v], self.low[w]) # o que o filho alcança, o pai também alcança
+                if self.low[w] > self.pre[v]:  # w não consegue subir até v por outro caminho
                     self.pontes.append((min(v, w), max(v, w)))
-            elif w != self.pai[v]:
-                self.low[v] = min(self.low[v], self.pre[w])
+            elif w != self.pai[v]: # aresta de retorno (ignora a volta pro pai)
+                self.low[v] = min(self.low[v], self.pre[w]) # atalho até um ancestral
 
 
 def main():
